@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const {createHmac,randomBytes} = require("crypto");  // use {npm i cryptohash} used for hashing password
+const { createTokenForUser } = require('../services/authentication');
 
 const userSchema = new mongoose.Schema({
 
@@ -48,7 +49,7 @@ userSchema.pre("save", function(next){   // when we try to save user this functi
 
 
 // virtual function to check or match user password in SignIn page
-userSchema.static("matchPassword",async function(email,password){
+userSchema.static("matchPasswordAndGenerateToken",async function(email,password){
     
     const user = await this.findOne({email});
     if(!user) throw new Error("User not found!");
@@ -59,7 +60,9 @@ userSchema.static("matchPassword",async function(email,password){
     const userProvidedHash = createHmac("sha256",salt).update(password).digest("hex");  // we will hash the password given by the user
 
     if(hashedPassword!==userProvidedHash) throw new Error("Incorrect Password !");
-    return user; // return user object only
+    
+    const token = createTokenForUser(user);
+    return token;
 
 })
 

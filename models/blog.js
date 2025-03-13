@@ -18,7 +18,9 @@ const blogSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "user",   // here user is current user
         
-    }
+    },
+    
+    
 
 
 
